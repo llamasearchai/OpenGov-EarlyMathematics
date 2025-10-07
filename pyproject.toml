@@ -1,0 +1,252 @@
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "opengov-earlymathematics"
+version = "0.1.0"
+description = "AI-powered personalized mathematics education platform for K-12 students"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Nik Jois"}
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = [
+    # Core dependencies
+    "pydantic>=2.4.0",
+    "pydantic-settings>=2.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "httpx>=0.25.0",
+
+    # AI & ML
+    "openai>=1.3.0",
+    "anthropic>=0.7.0",
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "pandas>=2.0.0",
+    "scikit-learn>=1.3.0",
+
+    # Data & Storage
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.12.0",
+    "redis>=5.0.0",
+    "sqlite-utils>=3.36.0",
+    "datasette>=0.64.0",
+
+    # LLM & CLI tools
+    "llm>=0.13.0",
+    "llm-ollama>=0.2.0",
+    "ollama>=0.2.0",
+
+    # UI & Interface
+    "rich>=13.6.0",
+    "typer>=0.9.0",
+    "streamlit>=1.28.0",
+    "textual>=0.45.0",
+
+    # Development & Quality
+    "structlog>=23.2.0",
+    "prometheus-client>=0.18.0",
+    "aiofiles>=23.2.1",
+    "python-dotenv>=1.0.0",
+
+    # Math & Education
+    "sympy>=1.12",
+    "matplotlib>=3.7.0",
+    "plotly>=5.17.0",
+    "networkx>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.12.0",
+    "pytest-benchmark>=4.0.0",
+    "pytest-xdist>=3.5.0",
+    "hypothesis>=6.90.0",
+    "faker>=20.0.0",
+]
+quality = [
+    "mypy>=1.7.0",
+    "ruff>=0.1.6",
+    "black>=23.11.0",
+    "isort>=5.12.0",
+    "pre-commit>=3.5.0",
+    "bandit>=1.7.0",
+    "safety>=2.4.0",
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.4.0",
+    "mkdocstrings>=0.24.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/opengov/earlymathematics"
+Documentation = "https://docs.opengovmath.edu"
+Repository = "https://github.com/opengov/earlymathematics"
+
+[project.scripts]
+opengov-math = "opengov_earlymathematics.cli:app"
+opengov-tui = "opengov_earlymathematics.tui.app:app"
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "mypy>=1.7.0",
+    "ruff>=0.1.6",
+    "black>=23.11.0",
+    "isort>=5.12.0",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "pytest --cov=src/opengov_earlymathematics --cov-report=term-missing --cov-report=html:htmlcov {args:tests}"
+lint = "ruff check src tests"
+fmt = "black src tests && isort src tests"
+fmt-check = "black --check src tests && isort --check-only src tests"
+type = "mypy src tests"
+quality = ["fmt-check", "lint", "type"]
+serve = "uvicorn src.opengov_earlymathematics.api.main:app --reload --host 0.0.0.0 --port 8000"
+streamlit-ui = "streamlit run src/opengov_earlymathematics/ui/app.py --server.headless true"
+tui = "python -m src.opengov_earlymathematics.tui.app"
+all = ["quality", "test"]
+
+[tool.hatch.envs.test]
+dependencies = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.12.0",
+    "pytest-benchmark>=4.0.0",
+    "pytest-xdist>=3.5.0",
+    "hypothesis>=6.90.0",
+    "faker>=20.0.0",
+]
+
+[tool.hatch.envs.test.scripts]
+test-unit = "pytest tests/unit -v"
+test-integration = "pytest tests/integration -v"
+test-e2e = "pytest tests/e2e -v"
+test-property = "pytest tests/property -v"
+test-benchmark = "pytest tests/benchmarks --benchmark-only"
+test-all = "pytest tests/ -v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM", "RUF", "A", "TCH", "TID", "ARG", "PTH", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG", "SLOT", "PIE", "T20", "PYI", "Q", "RSE", "RET", "SLF", "TCH", "INT", "BLE", "FBT", "FIX", "TD", "ANN", "S"]
+ignore = ["E501", "B008", "RUF012", "S101", "S102", "ANN101", "ANN102"]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*" = ["S101", "S102", "PLR2004"]
+"scripts/*" = ["T201"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["opengov_earlymathematics"]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = [
+    "transformers.*",
+    "torch.*",
+    "streamlit.*",
+    "dash.*",
+    "plotly.*",
+    "sympy.*",
+    "llm.*",
+    "ollama.*",
+    "openai.*",
+    "datasette.*",
+    "sqlite_utils.*",
+    "textual.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers --strict-config"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests",
+    "property: marks tests as property-based tests",
+    "benchmark: marks tests as benchmark tests",
+]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["src/opengov_earlymathematics"]
+omit = [
+    "*/tests/*",
+    "*/conftest.py",
+    "*/migrations/*",
+    # Omit runtime/interactive layers and external-service integrations from coverage
+    # Keep API included for coverage; exclude only highly interactive layers
+    "src/opengov_earlymathematics/ui/*",
+    "src/opengov_earlymathematics/tui/*",
+    "src/opengov_earlymathematics/main.py",
+    "src/opengov_earlymathematics/ml/student_model.py",
+    "src/opengov_earlymathematics/agents/*",
+    # Keep API routes included for full coverage
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "scripts"]
+skips = ["B101", "B601"]
